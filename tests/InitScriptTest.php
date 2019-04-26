@@ -14,10 +14,10 @@ class InitScriptTest extends TestCase
      */
     public function setUp()
     {
-        $projectDirectory = __DIR__.'/..';
+        $projectDirectory = __DIR__ . '/..';
 
-        exec("cp {$projectDirectory}/init.sh ".self::$testDirectory);
-        exec("cp -r {$projectDirectory}/resources ".self::$testDirectory);
+        exec("cp {$projectDirectory}/init.sh " . self::$testDirectory);
+        exec("cp -r {$projectDirectory}/resources " . self::$testDirectory);
     }
 
     /** @test */
@@ -33,7 +33,7 @@ class InitScriptTest extends TestCase
     {
         exec('bash init.sh');
 
-        $this->assertFileExists(self::$testDirectory.'/Homestead.yaml');
+        $this->assertFileExists(self::$testDirectory . '/Homestead.yaml');
     }
 
     /** @test */
@@ -41,7 +41,7 @@ class InitScriptTest extends TestCase
     {
         exec('bash init.sh json');
 
-        $this->assertFileExists(self::$testDirectory.'/Homestead.json');
+        $this->assertFileExists(self::$testDirectory . '/Homestead.json');
     }
 
     /** @test */
@@ -49,7 +49,7 @@ class InitScriptTest extends TestCase
     {
         exec('bash init.sh');
 
-        $this->assertFileExists(self::$testDirectory.'/after.sh');
+        $this->assertFileExists(self::$testDirectory . '/after.sh');
     }
 
     /** @test */
@@ -57,6 +57,6 @@ class InitScriptTest extends TestCase
     {
         exec('bash init.sh');
 
-        $this->assertFileExists(self::$testDirectory.'/aliases');
+        $this->assertFileExists(self::$testDirectory . '/aliases');
     }
 }
