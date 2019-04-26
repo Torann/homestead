@@ -2,7 +2,7 @@
 class Homestead
   def self.configure(config, settings)
     # Set The VM Provider
-    ENV['VAGRANT_DEFAULT_PROVIDER'] = settings['provider'] ||= 'virtualbox'
+    ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
 
     # Configure Local Variable To Access Scripts From Remote Location
     script_dir = File.dirname(__FILE__)
@@ -37,7 +37,7 @@ class Homestead
 
     # Configure A Few VirtualBox Settings
     config.vm.provider 'virtualbox' do |vb|
-      vb.name = settings['name'] ||= 'homestead-7'
+      vb.name = settings['name'] ||= 'homestead'
       vb.customize ['modifyvm', :id, '--memory', settings['memory'] ||= '2048']
       vb.customize ['modifyvm', :id, '--cpus', settings['cpus'] ||= '1']
       vb.customize ['modifyvm', :id, '--natdnsproxy1', 'on']
@@ -51,39 +51,6 @@ class Homestead
     # Override Default SSH port on the host
     if settings.has_key?('default_ssh_port')
       config.vm.network :forwarded_port, guest: 22, host: settings['default_ssh_port'], auto_correct: false, id: "ssh"
-    end
-
-    # Configure A Few VMware Settings
-    ['vmware_fusion', 'vmware_workstation'].each do |vmware|
-      config.vm.provider vmware do |v|
-        v.vmx['displayName'] = settings['name'] ||= 'homestead-7'
-        v.vmx['memsize'] = settings['memory'] ||= 2048
-        v.vmx['numvcpus'] = settings['cpus'] ||= 1
-        v.vmx['guestOS'] = 'ubuntu-64'
-        if settings.has_key?('gui') && settings['gui']
-          v.gui = true
-        end
-      end
-    end
-
-    # Configure A Few Hyper-V Settings
-    config.vm.provider "hyperv" do |h, override|
-      h.vmname = settings['name'] ||= 'homestead-7'
-      h.cpus = settings['cpus'] ||= 1
-      h.memory = settings['memory'] ||= 2048
-      h.linked_clone = true
-
-      if Vagrant.has_plugin?('vagrant-hostmanager')
-        override.hostmanager.ignore_private_ip = true
-      end
-    end
-
-    # Configure A Few Parallels Settings
-    config.vm.provider 'parallels' do |v|
-      v.name = settings['name'] ||= 'homestead-7'
-      v.update_guest_tools = settings['update_parallels_tools'] ||= false
-      v.memory = settings['memory'] ||= 2048
-      v.cpus = settings['cpus'] ||= 1
     end
 
     # Standardize Ports Naming Schema
@@ -169,10 +136,6 @@ class Homestead
       settings['folders'].each do |folder|
         if File.exist? File.expand_path(folder['map'])
           mount_opts = []
-
-          if ENV['VAGRANT_DEFAULT_PROVIDER'] == 'hyperv'
-            folder['type'] = 'smb'
-          end
 
           if folder['type'] == 'nfs'
             mount_opts = folder['mount_options'] ? folder['mount_options'] : ['actimeo=1', 'nolock']
