@@ -14,7 +14,7 @@ Homestead runs on any Windows, Mac, or Linux system, and includes the Nginx web 
 
 ### Included Software
 
-For a full list see [https://github.com/torann/settler](https://github.com/torann/settler)
+For a full list see [https://github.com/torann/settler](https://github.com/torann/settler).
 
 ## Installation & Setup
 
