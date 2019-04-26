@@ -279,16 +279,6 @@ class Homestead
     if settings.has_key?('variables')
       settings['variables'].each do |var|
         config.vm.provision 'shell' do |s|
-          s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/7.1/fpm/pool.d/www.conf"
-          s.args = [var['key'], var['value']]
-        end
-
-        config.vm.provision 'shell' do |s|
-          s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/7.2/fpm/pool.d/www.conf"
-          s.args = [var['key'], var['value']]
-        end
-
-        config.vm.provision 'shell' do |s|
             s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/7.3/fpm/pool.d/www.conf"
             s.args = [var['key'], var['value']]
         end
