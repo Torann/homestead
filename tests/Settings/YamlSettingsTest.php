@@ -130,7 +130,7 @@ class YamlSettingsTest extends TestCase
                     'to' => '/home/vagrant/Laravel/public',
                     'type' => 'laravel',
                     'schedule' => true,
-                    'php' => '7.1',
+                    'php' => '7.3',
                 ],
             ],
         ]);
@@ -143,7 +143,7 @@ class YamlSettingsTest extends TestCase
             'to' => '/home/vagrant/Laravel/public',
             'type' => 'laravel',
             'schedule' => true,
-            'php' => '7.1',
+            'php' => '7.3',
         ], $attributes['sites'][0]);
     }
 
