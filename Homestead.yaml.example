@@ -1,0 +1,33 @@
+---
+ip: "192.168.10.10"
+memory: 2048
+cpus: 1
+provider: virtualbox
+
+authorize: ~/.ssh/id_rsa.pub
+
+keys:
+    - ~/.ssh/id_rsa
+
+folders:
+    - map: ~/Code/quickstart-5.7
+      to: /home/vagrant/qs
+    - map: ~/Code/JoeFerguson.me-Jigsaw
+      to: /home/vagrant/joe
+
+sites:
+    - map: qs.test
+      to: /home/vagrant/qs/public
+    - map: joe.test
+      to: /home/vagrant/joe/build_local
+
+databases:
+    - homestead
+
+ports:
+    - send: 62000
+      to: 9200
+    - send: 1025
+      to: 1025
+    - send: 3000
+      to: 3000
