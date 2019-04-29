@@ -55,12 +55,6 @@ If this command fails, make sure your Vagrant installation is up to date.
 
 ### Configuring Homestead
 
-#### Setting Your Provider
-
-The `provider` key in your `Homestead.yaml` file indicates which Vagrant provider should be used: `virtualbox`. You may set this to the provider you prefer:
-
-    provider: virtualbox
-
 #### Configuring Shared Folders
 
 The `folders` property of the `Homestead.yaml` file lists all of the folders you wish to share with your Homestead environment. As files within these folders are changed, they will be kept in sync between your local machine and the Homestead environment. You may configure as many shared folders as necessary:
@@ -359,7 +353,6 @@ Supported `policy` values include: `none`, `download`, `upload`, and `public`.
 
 By default, the following ports are forwarded to your Homestead environment:
 
-<div class="content-list" markdown="1">
 - **SSH:** 2222 &rarr; Forwards To 22
 - **ngrok UI:** 4040 &rarr; Forwards To 4040
 - **HTTP:** 8000 &rarr; Forwards To 80
@@ -370,7 +363,6 @@ By default, the following ports are forwarded to your Homestead environment:
 - **Mailhog:** 8025 &rarr; Forwards To 8025
 - **Minio:** 9600 &rarr; Forwards To 9600
 - **Websockets:** 3000 &rarr; Forwards To 3000
-</div>
 
 #### Forwarding Additional Ports
 
