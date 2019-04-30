@@ -34,8 +34,8 @@ You should check out a tagged version of Homestead since the `master` branch may
 
     cd ~/Homestead
 
-    // Clone the desired release...
-    git checkout v1.0.3
+    // Optional - clone the desired release...
+    git checkout 1.0.1
 
 Once you have cloned the Homestead repository, run the `bash init.sh` command from the Homestead directory to create the `Homestead.yaml` configuration file. The `Homestead.yaml` file will be placed in the Homestead directory:
 
@@ -219,7 +219,7 @@ Homestead can automatically backup your database when your Vagrant box is destro
 
     backup: true
 
-Once configured, Homestead will export your databases to `mysql_backup` and `postgres_backup` directories when the `vagrant destroy` command is executed. These directories can be found in the folder where you cloned Homestead or in the root of your project if you are using the [per project installation](#per-project-installation) method.
+Once configured, Homestead will export your databases to `mysql_backup` and `postgres_backup` directories when the `vagrant destroy` command is executed. These directories can be found in the folder where you cloned Homestead.
 
 ### Database Snapshots
 
