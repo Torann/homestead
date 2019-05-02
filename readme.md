@@ -2,6 +2,40 @@
 
 [![Build Status](https://travis-ci.org/Torann/homestead.svg)](https://travis-ci.org/Torann/homestead)
 
+- [Introduction](#introduction)
+- [Installation & Setup](#installation-and-setup)
+    - [First Steps](#first-steps)
+    - [Configuring Homestead](#configuring-homestead)
+    - [Launching The Vagrant Box](#launching-the-vagrant-box)
+    - [Installing MariaDB](#installing-mariadb)
+    - [Installing MongoDB](#installing-mongodb)
+    - [Installing Elasticsearch](#installing-elasticsearch)
+    - [Installing Neo4j](#installing-neo4j)
+    - [Aliases](#aliases)
+- [Daily Usage](#daily-usage)
+    - [Accessing Homestead Globally](#accessing-homestead-globally)
+    - [Connecting Via SSH](#connecting-via-ssh)
+    - [Connecting To Databases](#connecting-to-databases)
+    - [Database Backups](#database-backups)
+    - [Database Snapshots](#database-snapshots)
+    - [Adding Additional Sites](#adding-additional-sites)
+    - [Environment Variables](#environment-variables)
+    - [Configuring Cron Schedules](#configuring-cron-schedules)
+    - [Configuring Mailhog](#configuring-mailhog)
+    - [Configuring Minio](#configuring-minio)
+    - [Ports](#ports)
+    - [Sharing Your Environment](#sharing-your-environment)
+    - [Web Servers](#web-servers)
+    - [Mail](#mail)
+- [Debugging & Profiling](#debugging-and-profiling)
+    - [Debugging Web Requests With Xdebug](#debugging-web-requests)
+    - [Debugging CLI Applications](#debugging-cli-applications)
+- [Network Interfaces](#network-interfaces)
+- [Extending Homestead](#extending-homestead)
+- [Updating Homestead](#updating-homestead)
+- [Provider Specific Settings](#provider-specific-settings)
+    - [VirtualBox](#provider-specific-virtualbox)
+
 ## Introduction
 
 Laravel strives to make the entire PHP development experience delightful, including your local development environment. [Vagrant](https://www.vagrantup.com) provides a simple, elegant way to manage and provision Virtual Machines.
@@ -10,7 +44,25 @@ Laravel Homestead is an official, pre-packaged Vagrant box that provides you a w
 
 Homestead runs on any Windows, Mac, or Linux system, and includes the Nginx web server, PHP 7.3, MySQL, PostgreSQL, Redis, Memcached, Node, and all of the other goodies you need to develop amazing Laravel applications.
 
-> If you are using Windows, you may need to enable hardware virtualization (VT-x). It can usually be enabled via your BIOS. If you are using Hyper-V on a UEFI system you may additionally need to disable Hyper-V in order to access VT-x.
+### Windows and Hyper-v
+
+If you are using Windows, you may need to enable hardware virtualization (VT-x). It can usually be enabled via your BIOS. If you are using Hyper-V on a UEFI system you may additionally need to disable Hyper-V in order to access VT-x.
+
+#### Windows 10
+
+**1.** Open command prompt as Administrator
+
+**2.** Run `bcdedit` to check hypervisor status:
+
+**3.** Check hypervisor launch type:
+
+![Boot Configuration Data](docs/bcd-console.png)
+
+**4.** If is set to **auto** then disable it:
+
+    bcdedit /set hypervisorlaunchtype off
+
+**5.** Reboot host machine and launch VirtualBox again
 
 ### Included Software
 
@@ -497,19 +549,9 @@ Next, you need to update the Homestead source code. If you cloned the repository
 
     git fetch
 
-    git checkout v8.2.0
+    git checkout v1.0.3
 
 These commands pull the latest Homestead code from the GitHub repository, fetches the latest tags, and then checks out the latest tagged release. You can find the latest stable release version on the [GitHub releases page](https://github.com/torann/homestead/releases).
-
-If you have installed Homestead via your project's `composer.json` file, you should ensure your `composer.json` file contains `"torann/homestead": "^8"` and update your dependencies:
-
-    composer update
-
-Finally, you will need to destroy and regenerate your Homestead box to utilize the latest Vagrant installation. To accomplish this, run the following commands in your Homestead directory:
-
-    vagrant destroy
-
-    vagrant up
 
 ## Provider Specific Settings
 
