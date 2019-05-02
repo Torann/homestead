@@ -3,10 +3,13 @@
 [![Build Status](https://travis-ci.org/Torann/homestead.svg)](https://travis-ci.org/Torann/homestead)
 
 - [Introduction](#introduction)
+    - [Included Software](#included-software)
+    - [Windows and Hyper-v](#windows-and-hyper-v)
 - [Installation & Setup](#installation-and-setup)
     - [First Steps](#first-steps)
     - [Configuring Homestead](#configuring-homestead)
     - [Launching The Vagrant Box](#launching-the-vagrant-box)
+- [Optional Setup](#optional-setup)
     - [Installing MariaDB](#installing-mariadb)
     - [Installing MongoDB](#installing-mongodb)
     - [Installing Elasticsearch](#installing-elasticsearch)
@@ -44,6 +47,10 @@ Laravel Homestead is an official, pre-packaged Vagrant box that provides you a w
 
 Homestead runs on any Windows, Mac, or Linux system, and includes the Nginx web server, PHP 7.3, MySQL, PostgreSQL, Redis, Memcached, Node, and all of the other goodies you need to develop amazing Laravel applications.
 
+### Included Software
+
+For a full list see [https://github.com/torann/settler](https://github.com/torann/settler).
+
 ### Windows and Hyper-v
 
 If you are using Windows, you may need to enable hardware virtualization (VT-x). It can usually be enabled via your BIOS. If you are using Hyper-V on a UEFI system you may additionally need to disable Hyper-V in order to access VT-x.
@@ -63,10 +70,6 @@ If you are using Windows, you may need to enable hardware virtualization (VT-x).
     bcdedit /set hypervisorlaunchtype off
 
 **5.** Reboot host machine and launch VirtualBox again
-
-### Included Software
-
-For a full list see [https://github.com/torann/settler](https://github.com/torann/settler).
 
 ## Installation & Setup
 
@@ -170,6 +173,8 @@ Make sure the IP address listed is the one set in your `Homestead.yaml` file. On
 Once you have edited the `Homestead.yaml` to your liking, run the `vagrant up` command from your Homestead directory. Vagrant will boot the virtual machine and automatically configure your shared folders and Nginx sites.
 
 To destroy the machine, you may use the `vagrant destroy --force` command.
+
+## Optional Setup
 
 ### Installing MariaDB
 
