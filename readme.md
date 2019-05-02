@@ -56,7 +56,7 @@ If you are using Windows, you may need to enable hardware virtualization (VT-x).
 
 **3.** Check hypervisor launch type:
 
-![Boot Configuration Data](docs/bcd-console.png)
+[[docs/bcd-console.png|alt=Boot Configuration Data]]
 
 **4.** If is set to **auto** then disable it:
 
