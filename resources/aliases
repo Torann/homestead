@@ -49,7 +49,7 @@ function serve-apache() {
     then
         sudo bash /vagrant/scripts/create-certificate.sh "$1"
         sudo dos2unix /vagrant/scripts/serve-apache.sh
-        sudo bash /vagrant/scripts/serve-apache.sh "$1" "$2" 80 443 "${3:-7.1}"
+        sudo bash /vagrant/scripts/serve-apache.sh "$1" "$2" 80 443 "${3:-7.3}"
     else
         echo "Error: missing required parameters."
         echo "Usage: "
@@ -62,7 +62,7 @@ function serve-laravel() {
     then
         sudo bash /vagrant/scripts/create-certificate.sh "$1"
         sudo dos2unix /vagrant/scripts/serve-laravel.sh
-        sudo bash /vagrant/scripts/serve-laravel.sh "$1" "$2" 80 443 "${3:-7.1}"
+        sudo bash /vagrant/scripts/serve-laravel.sh "$1" "$2" 80 443 "${3:-7.3}"
     else
         echo "Error: missing required parameters."
         echo "Usage: "
@@ -74,7 +74,7 @@ function serve-proxy() {
     if [[ "$1" && "$2" ]]
     then
         sudo dos2unix /vagrant/scripts/serve-proxy.sh
-        sudo bash /vagrant/scripts/serve-proxy.sh "$1" "$2" 80 443 "${3:-7.1}"
+        sudo bash /vagrant/scripts/serve-proxy.sh "$1" "$2" 80 443 "${3:-7.3}"
     else
         echo "Error: missing required parameters."
         echo "Usage: "
@@ -87,7 +87,7 @@ function serve-spa() {
   then
     sudo bash /vagrant/scripts/create-certificate.sh "$1"
     sudo dos2unix /vagrant/scripts/serve-spa.sh
-    sudo bash /vagrant/scripts/serve-spa.sh "$1" "$2" 80 443 "${3:-7.1}"
+    sudo bash /vagrant/scripts/serve-spa.sh "$1" "$2" 80 443 "${3:-7.3}"
   else
     echo "Error: missing required parameters."
     echo "Usage: "
@@ -100,7 +100,7 @@ function serve-rails() {
     then
         sudo bash /vagrant/scripts/create-certificate.sh "$1"
         sudo dos2unix /vagrant/scripts/serve-rails.sh
-        sudo bash /vagrant/scripts/serve-rails.sh "$1" "$2" 80 443 "${3:-7.1}"
+        sudo bash /vagrant/scripts/serve-rails.sh "$1" "$2" 80 443 "${3:-7.3}"
     else
         echo "Error: missing required parameters."
         echo "Usage: "
