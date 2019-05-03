@@ -30,21 +30,21 @@ fi
 
 if [ "$7" = "true" ]
 then configureXhgui="
-location /xhgui {
-    try_files \$uri \$uri/ /xhgui/index.php?\$args;
-}
+    location /xhgui {
+        try_files \$uri \$uri/ /xhgui/index.php?\$args;
+    }
 "
 else configureXhgui=""
 fi
 
 if [ "${11}" = "true" ]
 then configureWebsockets="
-location /socket {
-    proxy_pass http://websocket;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade \$http_upgrade;
-    proxy_set_header Connection \$connection_upgrade;
-}
+    location /socket {
+        proxy_pass http://websocket;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection \$connection_upgrade;
+    }
 "
 else configureWebsockets=""
 fi
