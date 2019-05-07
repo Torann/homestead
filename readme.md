@@ -428,7 +428,7 @@ By default, the following ports are forwarded to your Homestead environment:
 - **MongoDB:** 27017 &rarr; Forwards To 27017
 - **Mailhog:** 8025 &rarr; Forwards To 8025
 - **Minio:** 9600 &rarr; Forwards To 9600
-- **Websockets:** 3000 &rarr; Forwards To 3000
+- **Websockets:** 8022 &rarr; Forwards To 8022
 
 #### Forwarding Additional Ports
 
