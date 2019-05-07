@@ -72,6 +72,7 @@ class Homestead
       4040 => 4040,
       5432 => 54320,
       8025 => 8025,
+      9600 => 9600,
       27017 => 27017,
       3000 => 3000
     }
@@ -137,6 +138,10 @@ class Homestead
       settings['folders'].each do |folder|
         if File.exist? File.expand_path(folder['map'])
           mount_opts = []
+
+          if ENV['VAGRANT_DEFAULT_PROVIDER'] == 'hyperv'
+            folder['type'] = 'smb'
+          end
 
           if folder['type'] == 'nfs'
             mount_opts = folder['mount_options'] ? folder['mount_options'] : ['actimeo=1', 'nolock']
@@ -384,6 +389,14 @@ class Homestead
         config.vm.provision "shell" do |s|
             s.name = "Installing Oh-My-Zsh"
             s.path = script_dir + "/install-ohmyzsh.sh"
+        end
+    end
+
+    # Install Python If Necessary
+    if settings.has_key?("python") && settings["python"]
+        config.vm.provision "shell" do |s|
+            s.name = "Installing Python"
+            s.path = script_dir + "/install-python.sh"
         end
     end
 
