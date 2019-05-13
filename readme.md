@@ -327,7 +327,7 @@ Homestead supports several types of sites which allow you to easily run projects
           to: /home/vagrant/code/my-symfony-project/web
           type: "rails"
 
-The available site types are: `apache`, `laravel` (the default), `proxy`, `rails`, and `sp`.
+The available site types are: `apache`, `laravel` (the default), `proxy`, `rails`, and `spa`.
 
 #### Site Parameters
 
