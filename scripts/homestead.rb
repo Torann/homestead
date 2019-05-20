@@ -175,7 +175,7 @@ class Homestead
     config.vm.provision 'shell' do |s|
       s.path = script_dir + '/clear-nginx.sh'
     end
-    
+
     # Clear any Homestead sites and insert markers in /etc/hosts
     config.vm.provision 'shell' do |s|
       s.path = script_dir + '/hosts-reset.sh'
@@ -234,8 +234,17 @@ class Homestead
           s.path = script_dir + "/serve-#{type}.sh"
           s.args = [site['map'], site['to'], site['port'] ||= http_port, site['ssl'] ||= https_port, site['php'] ||= '7.3', params ||= '', site['xhgui'] ||= '', site['exec'] ||= 'false', headers ||= '', rewrites ||= '', site['websockets'] ||= 'false']
 
-          config.vm.provision 'shell' do |s|
-            s.inline = 'rm -rf ' + site['to'].to_s + '/ZendServer'
+          # generate pm2 json config file
+          if site['pm2']
+            config.vm.provision "shell" do |s2|
+              s2.name = 'Creating Site Ecosystem for pm2: ' + site['map']
+              s2.path = script_dir + "/create-ecosystem.sh"
+              s2.args = Array.new
+              s2.args << site['pm2'][0]['name']
+              s2.args << site['pm2'][0]['script'] ||= "npm"
+              s2.args << site['pm2'][0]['args'] ||= "run serve"
+              s2.args << site['pm2'][0]['cwd']
+            end
           end
 
           if site['xhgui'] == 'true'
@@ -332,11 +341,11 @@ class Homestead
 
     # Install Elasticsearch If Necessary
     if settings.has_key?('elasticsearch') && settings['elasticsearch']
-      config.vm.provision 'shell' do |s|
-        s.name = 'Installing Elasticsearch'
-        s.path = script_dir + '/install-elasticsearch.sh'
-        s.args = settings['elasticsearch']
-      end
+        config.vm.provision 'shell' do |s|
+            s.name = 'Installing Elasticsearch'
+            s.path = script_dir + '/install-elasticsearch.sh'
+            s.args = settings['elasticsearch']
+        end
     end
 
     # Install Go If Necessary
@@ -413,7 +422,7 @@ class Homestead
         end
     end
 
-    # Install WebDriver & Dusk Utils If Necessary
+    # Install WebDriver & Dust Utils If Necessary
     if settings.has_key?("webdriver") && settings["webdriver"]
         config.vm.provision "shell" do |s|
             s.name = "Installing WebDriver Utilities"
