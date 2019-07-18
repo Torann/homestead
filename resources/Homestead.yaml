@@ -20,6 +20,11 @@ sites:
 databases:
     - homestead
 
+features:
+    - mariadb: false
+    - ohmyzsh: false
+    - webdriver: false
+
 ports:
     - send: 62000
       to: 9200

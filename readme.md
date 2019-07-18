@@ -9,11 +9,7 @@
     - [First Steps](#first-steps)
     - [Configuring Homestead](#configuring-homestead)
     - [Launching The Vagrant Box](#launching-the-vagrant-box)
-- [Optional Setup](#optional-setup)
-    - [Installing MariaDB](#installing-mariadb)
-    - [Installing MongoDB](#installing-mongodb)
-    - [Installing Elasticsearch](#installing-elasticsearch)
-    - [Installing Neo4j](#installing-neo4j)
+    - [Installing Optional Features](#installing-optional-features)
     - [Aliases](#aliases)
 - [Daily Usage](#daily-usage)
     - [Accessing Homestead Globally](#accessing-homestead-globally)
@@ -28,6 +24,7 @@
     - [Configuring Minio](#configuring-minio)
     - [Ports](#ports)
     - [Sharing Your Environment](#sharing-your-environment)
+    - [Multiple PHP Versions](#multiple-php-versions)
     - [Web Servers](#web-servers)
     - [Mail](#mail)
 - [Debugging & Profiling](#debugging-and-profiling)
@@ -38,6 +35,7 @@
 - [Updating Homestead](#updating-homestead)
 - [Provider Specific Settings](#provider-specific-settings)
     - [VirtualBox](#provider-specific-virtualbox)
+    - [Symbolic Links On Windows](#symbolic-links-on-windows)
 
 ## Introduction
 
@@ -112,18 +110,26 @@ If this command fails, make sure your Vagrant installation is up to date.
 
 The `folders` property of the `Homestead.yaml` file lists all of the folders you wish to share with your Homestead environment. As files within these folders are changed, they will be kept in sync between your local machine and the Homestead environment. You may configure as many shared folders as necessary:
 
-    folders:
-        - map: ~/code
-          to: /home/vagrant/code
+```
+folders:
+    - map: ~/code/project1
+      to: /home/vagrant/project1
+```
 
-If you are only creating a few sites, this generic mapping will work just fine. However, as the number of sites continue to grow, you may begin to experience performance problems. This problem can be painfully apparent on low-end machines or projects that contain a very large number of files. If you are experiencing this issue, try mapping every project to its own Vagrant folder:
+> Windows users should not use the `~/` path syntax and instead should use the full path to their project, such as `C:\Users\user\Code\project1`.
 
-    folders:
-        - map: ~/code/project1
-          to: /home/vagrant/code/project1
+You should always map individual projects to their own folder mapping instead of mapping your entire `~/code` folder. When you map a folder the virtual machine must keep track of all disk IO for *every* file in the folder. This leads to performance issues if you have a large number of files in a folder.
 
-        - map: ~/code/project2
-          to: /home/vagrant/code/project2
+```
+folders:
+    - map: ~/code/project1
+      to: /home/vagrant/project1
+
+    - map: ~/code/project2
+      to: /home/vagrant/project2
+```
+
+> You should never mount `.` (the current directory) when using Homestead. This causes Vagrant to not map the current folder to `/vagrant` and will break optional features and cause unexpected results while provisioning.
 
 To enable [NFS](https://www.vagrantup.com/docs/synced-folders/nfs.html), you only need to add a simple flag to your synced folder configuration:
 
@@ -172,54 +178,68 @@ Once you have edited the `Homestead.yaml` to your liking, run the `vagrant up` c
 
 To destroy the machine, you may use the `vagrant destroy --force` command.
 
-## Optional Setup
+### Installing Optional Features
 
-### Installing MariaDB
+Optional software is installed using the "features" setting in your Homestead configuration file. Most features can be enabled or disabled with a boolean value, while some features allow multiple configuration options:
 
-If you prefer to use MariaDB instead of MySQL, you may add the `mariadb` option to your `Homestead.yaml` file. This option will remove MySQL and install MariaDB. MariaDB serves as a drop-in replacement for MySQL so you should still use the `mysql` database driver in your application's database configuration:
+```
+features:
+    - blackfire:
+        server_id: "server_id"
+        server_token: "server_value"
+        client_id: "client_id"
+        client_token: "client_value"
+    - cassandra: true
+    - chronograf: true
+    - couchdb: true
+    - crystal: true
+    - docker: true
+    - elasticsearch:
+        version: 7
+    - gearman: true
+    - golang: true
+    - grafana: true
+    - influxdb: true
+    - mariadb: true
+    - minio: true
+    - mongodb: true
+    - mysql8: true
+    - neo4j: true
+    - ohmyzsh: true
+    - openresty: true
+    - pm2: true
+    - python: true
+    - rabbitmq: true
+    - solr: true
+    - webdriver: true
+```
 
-    box: torann/homestead
-    ip: "192.168.10.10"
-    memory: 2048
-    cpus: 4
-    provider: virtualbox
-    mariadb: true
+#### MariaDB
 
-### Installing MongoDB
+Enabling MariaDB will remove MySQL and install MariaDB. MariaDB serves as a drop-in replacement for MySQL, so you should still use the `mysql` database driver in your application's database configuration.
 
-To install MongoDB Community Edition, update your `Homestead.yaml` file with the following configuration option:
-
-    mongodb: true
+#### MongoDB
 
 The default MongoDB installation will set the database username to `homestead` and the corresponding password to `secret`.
 
-### Installing Elasticsearch
+#### Elasticsearch
 
-To install Elasticsearch, add the `elasticsearch` option to your `Homestead.yaml` file and specify a supported version, which may be a major version or an exact version number (major.minor.patch). The default installation will create a cluster named 'homestead'. You should never give Elasticsearch more than half of the operating system's memory, so make sure your Homestead machine has at least twice the Elasticsearch allocation:
-
-    box: torann/homestead
-    ip: "192.168.10.10"
-    memory: 4096
-    cpus: 4
-    provider: virtualbox
-    elasticsearch: 6
+You may specify a supported version of Elasticsearch, which may be a major version or an exact version number (major.minor.patch). The default installation will create a cluster named 'homestead'. You should never give Elasticsearch more than half of the operating system's memory, so make sure your Homestead machine has at least twice the Elasticsearch allocation.
 
 > Check out the [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current) to learn how to customize your configuration.
 
-### Installing Neo4j
+#### Neo4j
 
-[Neo4j](https://neo4j.com/) is a graph database management system. To install Neo4j Community Edition, update your `Homestead.yaml` file with the following configuration option:
-
-    neo4j: true
-
-The default Neo4j installation will set the database username to `homestead` and corresponding password to `secret`. To access the Neo4j browser, visit `http://homestead.local:7474` via your web browser. The ports `7687` (Bolt), `7474` (HTTP), and `7473` (HTTPS) are ready to serve requests from the Neo4j client.
+The default Neo4j installation will set the database username to `homestead` and corresponding password to `secret`. To access the Neo4j browser, visit `http://homestead.test:7474` via your web browser. The ports `7687` (Bolt), `7474` (HTTP), and `7473` (HTTPS) are ready to serve requests from the Neo4j client.
 
 ### Aliases
 
 You may add Bash aliases to your Homestead machine by modifying the `aliases` file within your Homestead directory:
 
-    alias c='clear'
-    alias ..='cd ..'
+```
+alias c='clear'
+alias ..='cd ..'
+```
 
 After you have updated the `aliases` file, you should re-provision the Homestead machine using the `vagrant reload --provision` command. This will ensure that your new aliases are available on the machine.
 
@@ -320,14 +340,14 @@ Once the site has been added, run the `vagrant reload --provision` command from 
 
 #### Site Types
 
-Homestead supports several types of sites which allow you to easily run projects that are not based on Laravel. For example, we may easily add a Symfony application to Homestead using the `symfony2` site type:
+Homestead supports several types of sites which allow you to easily run projects that are not based on Laravel. For example, we may easily add a single page application to Homestead using the `spa` site type:
 
     sites:
         - map: rails.local
-          to: /home/vagrant/code/my-symfony-project/web
-          type: "rails"
+          to: /home/vagrant/code/spa
+          type: "spa"
 
-The available site types are: `apache`, `laravel` (the default), `proxy`, `rails`, and `spa`.
+The available site types are: `apache`, `laravel` (the default), `proxy`, and `spa`.
 
 #### Site Parameters
 
@@ -455,6 +475,26 @@ After running the command, you will see an Ngrok screen appear which contains th
 
 > Remember, Vagrant is inherently insecure and you are exposing your virtual machine to the Internet when running the `share` command.
 
+### Multiple PHP Versions
+
+Homestead supports multiple versions of PHP on the same virtual machine. You may specify which version of PHP to use for a given site within your `Homestead.yaml` file. The available PHP versions are: "7.0", "7.1", "7.2" and "7.3" (the default):
+
+```
+sites:
+    - map: homestead.test
+      to: /home/vagrant/project1/public
+      php: "7.1"
+```
+
+In addition, you may use any of the supported PHP versions via the CLI:
+
+```
+php7.0 artisan list
+php7.1 artisan list
+php7.2 artisan list
+php7.3 artisan list
+```
+
 ### Web Servers
 
 Homestead uses the Nginx web server by default. However, it can install Apache if `apache` is specified as a site type. While both web servers can be installed at the same time, they cannot both be *running* at the same time. The `flip` shell command is available to ease the process of switching between web servers. The `flip` command automatically determines which web server is running, shuts it off, and then starts the other server. To use this command, SSH into your Homestead machine and run the command in your terminal:
@@ -473,10 +513,12 @@ Homestead includes support for step debugging using [Xdebug](https://xdebug.org)
 
 To enable debugging, run the following commands inside your Vagrant box:
 
-    sudo phpenmod xdebug
+```
+sudo phpenmod xdebug
 
-    # Update this command to match your PHP version...
-    sudo systemctl restart php7.3-fpm 
+# Update this command to match your PHP version...
+sudo systemctl restart php7.3-fpm 
+```
 
 Next, follow your IDE's instructions to enable debugging. Finally, configure your browser to trigger Xdebug with an extension or [bookmarklet](https://www.jetbrains.com/phpstorm/marklets/).
 
@@ -486,26 +528,32 @@ Next, follow your IDE's instructions to enable debugging. Finally, configure you
 
 To debug a PHP CLI application, use the `xphp` shell alias inside your Vagrant box:
 
-    xphp path/to/script
+```
+xphp path/to/script
+```
 
 #### Autostarting Xdebug
 
 When debugging functional tests that make requests to the web server, it is easier to autostart debugging rather than modifying tests to pass through a custom header or cookie to trigger debugging. To force Xdebug to start automatically, modify `/etc/php/7.#/fpm/conf.d/20-xdebug.ini` inside your Vagrant box and add the following configuration:
 
-    ; If Homestead.yml contains a different subnet for the IP address, this address may be different...
-    xdebug.remote_host = 192.168.10.1
-    xdebug.remote_autostart = 1
+```
+; If Homestead.yml contains a different subnet for the IP address, this address may be different...
+xdebug.remote_host = 192.168.10.1
+xdebug.remote_autostart = 1
+```
 
 ### Profiling PHP Performance Using XHGui
 
 [XHGui](https://www.github.com/perftools/xhgui) is a user interface for exploring the performance of your PHP applications. To enable XHGui, add `xhgui: 'true'` to your site configuration:
 
-    sites:
-        -
-            map: your-site.local
-            to: /home/vagrant/code/web
-            type: "apache"
-            xhgui: 'true'
+```
+sites:
+    -
+        map: your-site.local
+        to: /home/vagrant/code/web
+        type: "apache"
+        xhgui: 'true'
+```
 
 If the site already exists, make sure to run `vagrant provision` after updating your configuration.
 
@@ -513,7 +561,9 @@ To profile a web request, add `xhgui=on` as a query parameter to a request. XHGu
 
 To profile a CLI request using XHGui, prefix the command with `XHGUI=on`:
 
-    XHGUI=on path/to/script
+```
+XHGUI=on path/to/script
+```
 
 CLI profile results may be viewed in the same way as web profile results.
 
@@ -525,22 +575,28 @@ Since performance profiles take up significant disk space, they are deleted auto
 
 The `networks` property of the `Homestead.yaml` configures network interfaces for your Homestead environment. You may configure as many interfaces as necessary:
 
-    networks:
-        - type: "private_network"
-          ip: "192.168.10.20"
+```
+networks:
+    - type: "private_network"
+      ip: "192.168.10.20"
+```
 
 To enable a [bridged](https://www.vagrantup.com/docs/networking/public_network.html) interface, configure a `bridge` setting and change the network type to `public_network`:
 
-    networks:
-        - type: "public_network"
-          ip: "192.168.10.20"
-          bridge: "en1: Wi-Fi (AirPort)"
+```
+networks:
+    - type: "public_network"
+      ip: "192.168.10.20"
+      bridge: "en1: Wi-Fi (AirPort)"
+```
 
 To enable [DHCP](https://www.vagrantup.com/docs/networking/public_network.html), just remove the `ip` option from your configuration:
 
-    networks:
-        - type: "public_network"
-          bridge: "en1: Wi-Fi (AirPort)"
+```
+networks:
+    - type: "public_network"
+      bridge: "en1: Wi-Fi (AirPort)"
+```
 
 ## Extending Homestead
 
@@ -548,22 +604,28 @@ You may extend Homestead using the `after.sh` script in the root of your Homeste
 
 When customizing Homestead, Ubuntu may ask you if you would like to keep a package's original configuration or overwrite it with a new configuration file. To avoid this, you should use the following command when installing packages to avoid overwriting any configuration previously written by Homestead:
 
-    sudo apt-get -y \
-        -o Dpkg::Options::="--force-confdef" \
-        -o Dpkg::Options::="--force-confold" \
-        install your-package
+```
+sudo apt-get -y \
+    -o Dpkg::Options::="--force-confdef" \
+    -o Dpkg::Options::="--force-confold" \
+    install your-package
+```
 
 ## Updating Homestead
 
 You can update Homestead in a few simple steps. First, you should update the Vagrant box using the `vagrant box update` command:
 
-    vagrant box update
+```
+vagrant box update
+```
 
 Next, you need to update the Homestead source code. If you cloned the repository you can run the following commands at the location you originally cloned the repository:
 
-    git fetch
+```
+git fetch
 
-    git checkout v1.0.3
+git checkout v1.0.3
+```
 
 These commands pull the latest Homestead code from the GitHub repository, fetches the latest tags, and then checks out the latest tagged release. You can find the latest stable release version on the [GitHub releases page](https://github.com/torann/homestead/releases).
 
@@ -582,6 +644,8 @@ By default, Homestead configures the `natdnshostresolver` setting to `on`. This 
 
 If symbolic links are not working properly on your Windows machine, you may need to add the following block to your `Vagrantfile`:
 
-    config.vm.provider "virtualbox" do |v|
-        v.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root", "1"]
-    end
+```
+config.vm.provider "virtualbox" do |v|
+    v.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root", "1"]
+end
+```

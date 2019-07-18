@@ -3,14 +3,14 @@
 export DEBIAN_FRONTEND=noninteractive
 # Check If Maria Has Been Installed
 
-if [ -f /home/vagrant/.maria ]
+if [ -f /home/vagrant/.homestead-features/mariadb ]
 then
     echo "MariaDB already installed."
     exit 0
 fi
 
-touch /home/vagrant/.maria
-chown -Rf vagrant:vagrant /home/vagrant/.maria
+touch /home/vagrant/.homestead-features/mariadb
+chown -Rf vagrant:vagrant /home/vagrant/.homestead-features
 
 # Disable Apparmor
 # See https://github.com/laravel/homestead/issues/629#issue-247524528
@@ -25,7 +25,6 @@ apt-get remove -y --purge mysql-server mysql-client mysql-common
 apt-get autoremove -y
 apt-get autoclean
 
-rm -rf /var/lib/mysql
 rm -rf /var/log/mysql
 rm -rf /etc/mysql
 
@@ -47,15 +46,25 @@ debconf-set-selections <<< "mariadb-server mysql-server/root_password_again pass
 
 apt-get install -y mariadb-server
 
-# Configure Maria Remote Access
+# Configure Maria Remote Access and ignore db dirs
+cat > /etc/mysql/conf.d/mysql.cnf << EOF
+[mysqld]
+bind-address = 0.0.0.0
+ignore-db-dir = lost+found
+EOF
 
-sed -i '/^bind-address/s/bind-address.*=.*/bind-address = 0.0.0.0/' /etc/mysql/my.cnf
+export MYSQL_PWD=secret
 
-mysql --user="root" --password="secret" -e "GRANT ALL ON *.* TO root@'0.0.0.0' IDENTIFIED BY 'secret' WITH GRANT OPTION;"
+mysql --user="root" -e "GRANT ALL ON *.* TO root@'0.0.0.0' IDENTIFIED BY 'secret' WITH GRANT OPTION;"
 service mysql restart
 
-mysql --user="root" --password="secret" -e "CREATE USER 'homestead'@'0.0.0.0' IDENTIFIED BY 'secret';"
-mysql --user="root" --password="secret" -e "GRANT ALL ON *.* TO 'homestead'@'0.0.0.0' IDENTIFIED BY 'secret' WITH GRANT OPTION;"
-mysql --user="root" --password="secret" -e "GRANT ALL ON *.* TO 'homestead'@'%' IDENTIFIED BY 'secret' WITH GRANT OPTION;"
-mysql --user="root" --password="secret" -e "FLUSH PRIVILEGES;"
+mysql --user="root" -e "CREATE USER IF NOT EXISTS 'homestead'@'0.0.0.0' IDENTIFIED BY 'secret';"
+mysql --user="root" -e "GRANT ALL ON *.* TO 'homestead'@'0.0.0.0' IDENTIFIED BY 'secret' WITH GRANT OPTION;"
+mysql --user="root" -e "GRANT ALL ON *.* TO 'homestead'@'%' IDENTIFIED BY 'secret' WITH GRANT OPTION;"
+mysql --user="root" -e "FLUSH PRIVILEGES;"
 service mysql restart
+
+mysql_upgrade --user="root" --verbose --force
+service mysql restart
+
+unset MYSQL_PWD

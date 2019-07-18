@@ -5,6 +5,7 @@ alias h='cd ~'
 alias c='clear'
 alias art=artisan
 
+alias codecept='vendor/bin/codecept'
 alias phpspec='vendor/bin/phpspec'
 alias phpunit='vendor/bin/phpunit'
 alias serve=serve-laravel
@@ -36,6 +37,30 @@ function dusk() {
     fi
 
     php artisan dusk "$@"
+}
+
+function php56() {
+    sudo update-alternatives --set php /usr/bin/php5.6
+    sudo update-alternatives --set php-config /usr/bin/php-config5.6
+    sudo update-alternatives --set phpize /usr/bin/phpize5.6
+}
+
+function php70() {
+    sudo update-alternatives --set php /usr/bin/php7.0
+    sudo update-alternatives --set php-config /usr/bin/php-config7.0
+    sudo update-alternatives --set phpize /usr/bin/phpize7.0
+}
+
+function php71() {
+    sudo update-alternatives --set php /usr/bin/php7.1
+    sudo update-alternatives --set php-config /usr/bin/php-config7.1
+    sudo update-alternatives --set phpize /usr/bin/phpize7.1
+}
+
+function php72() {
+    sudo update-alternatives --set php /usr/bin/php7.2
+    sudo update-alternatives --set php-config /usr/bin/php-config7.2
+    sudo update-alternatives --set phpize /usr/bin/phpize7.2
 }
 
 function php73() {
@@ -93,19 +118,6 @@ function serve-spa() {
     echo "Usage: "
     echo "  serve-spa domain path"
   fi
-}
-
-function serve-rails() {
-    if [[ "$1" && "$2" ]]
-    then
-        sudo bash /vagrant/scripts/create-certificate.sh "$1"
-        sudo dos2unix /vagrant/scripts/serve-rails.sh
-        sudo bash /vagrant/scripts/serve-rails.sh "$1" "$2" 80 443 "${3:-7.3}"
-    else
-        echo "Error: missing required parameters."
-        echo "Usage: "
-        echo "  serve-rails domain path"
-    fi
 }
 
 function share() {
@@ -190,23 +202,13 @@ function xphp() {
     fi
 
     if ! $XDEBUG_ENABLED; then xon; fi
+	
+    HOST_IP=$(last --limit=1 | grep -oP '\d+(\.\d+){3}')
 
     php \
-        -dxdebug.remote_host=192.168.10.1 \
+        -dxdebug.remote_host=${HOST_IP} \
         -dxdebug.remote_autostart=1 \
         "$@"
 
     if ! $XDEBUG_ENABLED; then xoff; fi
-}
-
-function update-socket-wrench() {
-    cd /var/www/socket-wrench
-    git pull origin release
-    composer install
-    php artisan migrate --force
-}
-
-function seed-socket-wrench() {
-    cd /var/www/socket-wrench
-    php artisan db:seed
 }
