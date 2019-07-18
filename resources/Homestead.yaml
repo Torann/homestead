@@ -23,7 +23,6 @@ databases:
 features:
     - mariadb: false
     - ohmyzsh: false
-    - webdriver: false
 
 ports:
     - send: 62000
