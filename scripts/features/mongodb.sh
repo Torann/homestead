@@ -30,17 +30,6 @@ sudo mv /tmp/mongo-php-driver /usr/src/mongo-php-driver
 cd /usr/src/mongo-php-driver
 git submodule -q update --init
 
-sudo DEBIAN_FRONTEND=noninteractive apt-get -y install php5.6-dev
-phpize5.6
-./configure --with-php-config=/usr/bin/php-config5.6 > /dev/null
-make clean > /dev/null
-make >/dev/null 2>&1
-sudo make install
-sudo bash -c "echo 'extension=mongodb.so' > /etc/php/5.6/mods-available/mongo.ini"
-sudo ln -s /etc/php/5.6/mods-available/mongo.ini /etc/php/5.6/cli/conf.d/20-mongo.ini
-sudo ln -s /etc/php/5.6/mods-available/mongo.ini /etc/php/5.6/fpm/conf.d/20-mongo.ini
-sudo service php5.6-fpm restart
-
 sudo DEBIAN_FRONTEND=noninteractive apt-get -y install php7.0-dev
 phpize7.0
 ./configure --with-php-config=/usr/bin/php-config7.0 > /dev/null
