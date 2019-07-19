@@ -35,7 +35,7 @@
 - [Updating Homestead](#updating-homestead)
 - [Provider Specific Settings](#provider-specific-settings)
     - [VirtualBox](#provider-specific-virtualbox)
-    - [Symbolic Links On Windows](#symbolic-links-on-windows)
+    - [Symbolic Links](#symbolic-links)
 
 ## Introduction
 
@@ -637,15 +637,17 @@ These commands pull the latest Homestead code from the GitHub repository, fetche
 
 By default, Homestead configures the `natdnshostresolver` setting to `on`. This allows Homestead to use your host operating system's DNS settings. If you would like to override this behavior, add the following lines to your `Homestead.yaml` file:
 
-    provider: virtualbox
-    natdnshostresolver: off
+```
+provider: virtualbox
+natdnshostresolver: off
+```
 
-#### Symbolic Links On Windows
+#### Symbolic Links
 
-If symbolic links are not working properly on your Windows machine, you may need to add the following block to your `Vagrantfile`:
+Virtualbox does not allow symlinks on shared folders for security reasons. To enable symlinks the following setting needs to be added to the `Homestead.yaml` configuration file:
 
 ```
-config.vm.provider "virtualbox" do |v|
-    v.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root", "1"]
-end
+shared_folder_symlink: true
 ```
+
+> Additionally, on windows vagrant up needs to be executed in a shell with admin rights. No workarounds necessary.

@@ -46,6 +46,9 @@ class Homestead
       if settings.has_key?('gui') && settings['gui']
         vb.gui = true
       end
+      if settings.has_key?('shared_folder_symlink') && settings['shared_folder_symlink']
+        vb.customize ['setextradata', :id, 'VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root', '1']
+      end
     end
 
     # Override Default SSH port on the host
