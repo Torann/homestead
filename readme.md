@@ -35,7 +35,8 @@
 - [Updating Homestead](#updating-homestead)
 - [Provider Specific Settings](#provider-specific-settings)
     - [VirtualBox](#provider-specific-virtualbox)
-    - [Symbolic Links](#symbolic-links)
+        - [Syncing Bug With Virtualbox](#syncing-bug)
+        - [Symbolic Links](#symbolic-links)
 
 ## Introduction
 
@@ -642,7 +643,7 @@ provider: virtualbox
 natdnshostresolver: off
 ```
 
-### Syncing Bug With Virtualbox
+#### Syncing Bug
 
 Virtualbox 6 seems to have a known syncing issue on some host machines, to fix this you should add `type: smb` to any shared folders, this will use Samba instead of vboxsf mounting. Until Virtualbox fixes this issue we will have to use SMB. If using this solution you will also need to use the [Symbolic Links](#symbolic-links) settings below.
 
