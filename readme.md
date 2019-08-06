@@ -642,6 +642,14 @@ provider: virtualbox
 natdnshostresolver: off
 ```
 
+### Syncing Bug With Virtualbox
+
+Virtualbox 6 seems to have a known syncing issue on some host machines, to fix this you should add `type: smb` to any shared folders, this will use Samba instead of vboxsf mounting. Until Virtualbox fixes this issue we will have to use SMB. If using this solution you will also need to use the [Symbolic Links](#symbolic-links) settings below.
+
+**Note:** MacOS users that have never used folder type smb may need to do the following: **Open System Preferences** -> **Sharing** -> **Click Enable File Sharing** -> **Click "Share files and folders using SMB"**. From there you need to add your account / password to the "Windows File Sharing". This should enable your MacOS account to be used.
+
+This is not at all a solution I'm happy with, but it's the only one I can currently offer.
+
 #### Symbolic Links
 
 Virtualbox does not allow symlinks on shared folders for security reasons. To enable symlinks the following setting needs to be added to the `Homestead.yaml` configuration file:
