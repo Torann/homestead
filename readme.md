@@ -34,8 +34,8 @@
 - [Extending Homestead](#extending-homestead)
 - [Updating Homestead](#updating-homestead)
 - [Provider Specific Settings](#provider-specific-settings)
-    - [VirtualBox](#provider-specific-virtualbox)
-        - [Syncing Bug With Virtualbox](#syncing-bug)
+    - [VirtualBox](#virtualbox)
+        - [Syncing Bug](#syncing-bug)
         - [Symbolic Links](#symbolic-links)
 
 ## Introduction
