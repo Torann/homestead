@@ -31,7 +31,7 @@ class Homestead
     # Configure Additional Networks
     if settings.has_key?('networks')
       settings['networks'].each do |network|
-        config.vm.network network['type'], ip: network['ip'], bridge: network['bridge'] ||= nil, netmask: network['netmask'] ||= '255.255.255.0'
+        config.vm.network network['type'], ip: network['ip'], mac: network['mac'], bridge: network['bridge'] ||= nil, netmask: network['netmask'] ||= '255.255.255.0'
       end
     end
 
@@ -46,14 +46,32 @@ class Homestead
       if settings.has_key?('gui') && settings['gui']
         vb.gui = true
       end
-      if settings.has_key?('shared_folder_symlink') && settings['shared_folder_symlink']
-        vb.customize ['setextradata', :id, 'VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root', '1']
-      end
     end
 
     # Override Default SSH port on the host
     if settings.has_key?('default_ssh_port')
       config.vm.network :forwarded_port, guest: 22, host: settings['default_ssh_port'], auto_correct: false, id: "ssh"
+    end
+
+    # Configure A Few Hyper-V Settings
+    config.vm.provider "hyperv" do |h, override|
+      h.vmname = settings['name'] ||= 'homestead'
+      h.cpus = settings['cpus'] ||= 1
+      h.memory = settings['memory'] ||= 2048
+      h.linked_clone = true
+      if settings.has_key?('hyperv_mac') && settings['hyperv_mac']
+        h.mac = settings['hyperv_mac']
+      end
+      if settings.has_key?('hyperv_maxmemory') && settings['hyperv_maxmemory']
+        h.maxmemory = settings['hyperv_maxmemory']
+      end
+      if settings.has_key?('hyperv_enable_virtualization_extensions') && settings['hyperv_enable_virtualization_extensions']
+        h.enable_virtualization_extensions = true
+      end
+
+      if Vagrant.has_plugin?('vagrant-hostmanager')
+        override.hostmanager.ignore_private_ip = true
+      end
     end
 
     # Standardize Ports Naming Schema
@@ -186,6 +204,21 @@ class Homestead
     config.vm.provision "shell", inline: "mkdir -p /home/vagrant/.homestead-features"
     config.vm.provision "shell", inline: "chown -Rf vagrant:vagrant /home/vagrant/.homestead-features"
 
+    # Enable Services
+    if settings.has_key?('services')
+      settings['services'].each do |service|
+        service['enabled'].each do |enable_service|
+          config.vm.provision "shell", inline: "sudo systemctl enable #{enable_service}"
+          config.vm.provision "shell", inline: "sudo systemctl start #{enable_service}"
+        end if service.include?('enabled')
+
+        service['disabled'].each do |disable_service|
+          config.vm.provision "shell", inline: "sudo systemctl disable #{disable_service}"
+          config.vm.provision "shell", inline: "sudo systemctl stop #{disable_service}"
+        end if service.include?('disabled')
+      end
+    end
+
     # Install opt-in features
     if settings.has_key?('features')
       settings['features'].each do |feature|
@@ -232,13 +265,25 @@ class Homestead
       # socket = { 'map' => 'socket-wrench.test', 'to' => '/var/www/socket-wrench/public' }
       # settings['sites'].unshift(socket)
 
+      domains = []
+
       settings['sites'].each do |site|
+
+        domains.push(site['map'])
 
         # Create SSL certificate
         config.vm.provision 'shell' do |s|
           s.name = 'Creating Certificate: ' + site['map']
           s.path = script_dir + '/create-certificate.sh'
           s.args = [site['map']]
+        end
+
+        if site['wildcard'] == 'yes'
+          config.vm.provision 'shell' do |s|
+            s.name = 'Creating Wildcard Certificate: *.' + site['map'].partition('.').last
+            s.path = script_dir + '/create-certificate.sh'
+            s.args = ['*.' + site['map'].partition('.').last]
+          end
         end
 
         type = site['type'] ||= 'laravel'
@@ -278,8 +323,49 @@ class Homestead
             rewrites.gsub! '$', '\$'
           end
 
+          # Convert the site & any options to an array of arguments passed to the
+          # specific site type script (defaults to laravel)
           s.path = script_dir + "/site-types/#{type}.sh"
-          s.args = [site['map'], site['to'], site['port'] ||= http_port, site['ssl'] ||= https_port, site['php'] ||= '7.3', params ||= '', site['xhgui'] ||= '', site['exec'] ||= 'false', headers ||= '', rewrites ||= '', site['websockets'] ||= 'false']
+          s.args = [
+              site['map'],                      # $1
+              site['to'],                       # $2
+              site['port'] ||= http_port,       # $3
+              site['ssl'] ||= https_port,       # $4
+              site['php'] ||= '7.4',            # $5
+              params ||= '',                    # $6
+              site['xhgui'] ||= '',             # $7
+              site['exec'] ||= 'false',         # $8
+              headers ||= '',                   # $9
+              rewrites ||= '',                  # $10
+              site['websockets'] ||= 'false'    # $11
+          ]
+
+          # Should we use the wildcard ssl?
+          if site['wildcard'] == 'yes' or site['use_wildcard'] == 'yes'
+            if site['use_wildcard'] != 'no'
+              if site['type'] != 'apache'
+                config.vm.provision 'shell' do |s|
+                  s.inline = "sed -i \"s/$1.crt/*.$2.crt/\" /etc/nginx/sites-available/$1"
+                  s.args = [site['map'], site['map'].partition('.').last]
+                end
+
+                config.vm.provision 'shell' do |s|
+                  s.inline = "sed -i \"s/$1.key/*.$2.key/\" /etc/nginx/sites-available/$1"
+                  s.args = [site['map'], site['map'].partition('.').last]
+                end
+              else
+                config.vm.provision 'shell' do |s|
+                  s.inline = "sed -i \"s/$1.crt/*.$2.crt/\" /etc/apache2/sites-available/$1-ssl.conf"
+                  s.args = [site['map'], site['map'].partition('.').last]
+                end
+
+                config.vm.provision 'shell' do |s|
+                  s.inline = "sed -i \"s/$1.key/*.$2.key/\" /etc/apache2/sites-available/$1-ssl.conf"
+                  s.args = [site['map'], site['map'].partition('.').last]
+                end
+              end
+            end
+          end
 
           # generate pm2 json config file
           if site['pm2']
@@ -351,22 +437,12 @@ class Homestead
     if settings.has_key?('variables')
       settings['variables'].each do |var|
         config.vm.provision 'shell' do |s|
-          s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/7.0/fpm/pool.d/www.conf"
-          s.args = [var['key'], var['value']]
-        end
-
-        config.vm.provision 'shell' do |s|
-          s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/7.1/fpm/pool.d/www.conf"
-          s.args = [var['key'], var['value']]
-        end
-
-        config.vm.provision 'shell' do |s|
-          s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/7.2/fpm/pool.d/www.conf"
-          s.args = [var['key'], var['value']]
-        end
-
-        config.vm.provision 'shell' do |s|
           s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/7.3/fpm/pool.d/www.conf"
+          s.args = [var['key'], var['value']]
+        end
+
+        config.vm.provision 'shell' do |s|
+          s.inline = "echo \"\nenv[$1] = '$2'\" >> /etc/php/7.4/fpm/pool.d/www.conf"
           s.args = [var['key'], var['value']]
         end
 
@@ -377,7 +453,7 @@ class Homestead
       end
 
       config.vm.provision 'shell' do |s|
-        s.inline = 'service php7.0-fpm restart;service php7.1-fpm restart; service php7.2-fpm restart; service php7.3-fpm restart;'
+        s.inline = 'service php7.3-fpm restart; service php7.4-fpm restart;'
       end
     end
 
@@ -387,8 +463,8 @@ class Homestead
     end
 
     config.vm.provision 'shell' do |s|
-      s.name = 'Restarting Nginx'
-      s.inline = 'sudo service nginx restart;sudo service php7.0-fpm restart;sudo service php7.1-fpm restart; sudo service php7.2-fpm restart; sudo service php7.3-fpm restart;'
+      s.name = 'Restart Webserver'
+      s.path = script_dir + '/restart-webserver.sh'
     end
 
     # Configure All Of The Configured Databases
@@ -450,7 +526,7 @@ class Homestead
     end
 
     # Create Minio Buckets
-    if settings.has_key?('buckets') && settings['minio']
+    if settings.has_key?('buckets') && settings['features'].any? { |feature| feature.include?('minio') }
       settings['buckets'].each do |bucket|
         config.vm.provision 'shell' do |s|
           s.name = 'Creating Minio Bucket: ' + bucket['name']
@@ -502,7 +578,7 @@ class Homestead
     now = Time.now.strftime("%Y%m%d%H%M")
     config.trigger.before :destroy do |trigger|
       trigger.warn = "Backing up mysql database #{database}..."
-      trigger.run_remote = { inline: "mkdir -p #{dir} && mysqldump --routines #{database} > #{dir}/#{database}-#{now}.sql" }
+      trigger.run_remote = {inline: "mkdir -p #{dir}/#{now} && mysqldump --routines #{database} > #{dir}/#{now}/#{database}-#{now}.sql"}
     end
   end
 
@@ -510,7 +586,7 @@ class Homestead
     now = Time.now.strftime("%Y%m%d%H%M")
     config.trigger.before :destroy do |trigger|
       trigger.warn = "Backing up postgres database #{database}..."
-      trigger.run_remote = { inline: "mkdir -p #{dir} && echo localhost:5432:#{database}:homestead:secret > ~/.pgpass && chmod 600 ~/.pgpass && pg_dump -U homestead -h localhost #{database} > #{dir}/#{database}-#{now}.sql" }
+      trigger.run_remote = {inline: "mkdir -p #{dir}/#{now} && echo localhost:5432:#{database}:homestead:secret > ~/.pgpass && chmod 600 ~/.pgpass && pg_dump -U homestead -h localhost #{database} > #{dir}/#{now}/#{database}-#{now}.sql"}
     end
   end
 end

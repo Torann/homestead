@@ -11,33 +11,29 @@ export DEBIAN_FRONTEND=noninteractive
 touch /home/vagrant/.homestead-features/mysql8
 chown -Rf vagrant:vagrant /home/vagrant/.homestead-features
 
-# Disable Apparmor
-## See https://github.com/laravel/homestead/issues/629#issue-247524528
-service apparmor stop
-service apparmor teardown
-update-rc.d -f apparmor remove
-
 # Remove MySQL
 apt-get remove -y --purge mysql-server mysql-client mysql-common
 apt-get autoremove -y
 apt-get autoclean
 
-rm -rf /var/lib/mysql
+rm -rf /homestead-vg/master/*
 rm -rf /var/log/mysql
 rm -rf /etc/mysql
 
 # Add MySQL PPA
-wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.12-1_all.deb
-dpkg -i mysql-apt-config_0.8.12-1_all.deb
-sed -i 's/mysql-5.7/mysql-8.0/g' /etc/apt/sources.list.d/mysql.list
-rm -rf mysql-apt-config_0.8.12-1_all.deb
-apt-key adv --keyserver keys.gnupg.net --recv-keys 8C718D3B5072E1F5
+wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.14-1_all.deb
+dpkg -i mysql-apt-config_0.8.14-1_all.deb
+rm -rf mysql-apt-config_0.8.14-1_all.deb
 apt-get update
 
 # Set The Automated Root Password
 debconf-set-selections <<< "mysql-server mysql-server/data-dir select ''"
 debconf-set-selections <<< "mysql-server mysql-server/root_password password secret"
 debconf-set-selections <<< "mysql-server mysql-server/root_password_again password secret"
+
+echo '/homestead-vg/ r,' >> /etc/apparmor.d/local/usr.sbin.mysqld
+echo '/homestead-vg/** rwk,' >> /etc/apparmor.d/local/usr.sbin.mysqld
+systemctl restart apparmor
 
 # Install MySQL 8
 apt-get install -y mysql-server

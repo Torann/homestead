@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 declare -A params=$6     # Create an associative array
-declare -A headers=${10}      # Create an associative array
+declare -A headers=${9}  # Create an associative array
 paramsTXT=""
 if [ -n "$6" ]; then
     for element in "${!params[@]}"
@@ -11,7 +11,7 @@ if [ -n "$6" ]; then
     done
 fi
 headersTXT=""
-if [ -n "${10}" ]; then
+if [ -n "${9}" ]; then
    for element in "${!headers[@]}"
    do
       headersTXT="${headersTXT}
@@ -20,9 +20,12 @@ if [ -n "${10}" ]; then
 fi
 
 export DEBIAN_FRONTEND=noninteractive
+
 sudo service nginx stop
+sudo systemctl disable nginx
+
 apt-get update
-apt-get install -y apache2 php"$5"-cgi libapache2-mod-fcgid
+apt-get -o Dpkg::Options::="--force-confold" install -y apache2 php"$5"-cgi libapache2-mod-fcgid
 sed -i "s/www-data/vagrant/" /etc/apache2/envvars
 
 block="<VirtualHost *:$3>

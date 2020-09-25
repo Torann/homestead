@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 declare -A params=$6       # Create an associative array
-declare -A headers=$9      # Create an associative array
+declare -A headers=${9}    # Create an associative array
 declare -A rewrites=${10}  # Create an associative array
 paramsTXT=""
 if [ -n "$6" ]; then
@@ -12,7 +12,7 @@ if [ -n "$6" ]; then
    done
 fi
 headersTXT=""
-if [ -n "$9" ]; then
+if [ -n "${9}" ]; then
    for element in "${!headers[@]}"
    do
       headersTXT="${headersTXT}
@@ -30,21 +30,21 @@ fi
 
 if [ "$7" = "true" ]
 then configureXhgui="
-    location /xhgui {
+location /xhgui {
         try_files \$uri \$uri/ /xhgui/index.php?\$args;
-    }
+}
 "
 else configureXhgui=""
 fi
 
 if [ "${11}" = "true" ]
 then configureWebsockets="
-    location /socket {
-        proxy_pass http://127.0.0.1:8022;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \"websocket\";
-        proxy_set_header Connection \"Upgrade\";
-    }
+location /socket {
+    proxy_pass http://127.0.0.1:8022;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade \"websocket\";
+    proxy_set_header Connection \"Upgrade\";
+}
 "
 else configureWebsockets=""
 fi

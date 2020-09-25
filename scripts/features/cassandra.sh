@@ -13,7 +13,7 @@ chown -Rf vagrant:vagrant /home/vagrant/.homestead-features
 echo "deb http://www.apache.org/dist/cassandra/debian 311x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
 wget -q -O - https://www.apache.org/dist/cassandra/KEYS | sudo apt-key add -
 sudo DEBIAN_FRONTEND=noninteractive apt update
-sudo DEBIAN_FRONTEND=noninteractive apt install cassandra openjdk-8-jdk git libgmp-dev php7.1-dev php7.2-dev php7.3-dev -y
+sudo DEBIAN_FRONTEND=noninteractive apt install cassandra openjdk-8-jdk git libgmp-dev php7.3-dev php7.4-dev -y
 
 # Start Cassandra and boot at runtime
 sudo service cassandra start
@@ -35,25 +35,6 @@ cd /usr/src
 git clone https://github.com/datastax/php-driver.git
 
 cd /usr/src/php-driver/ext
-sudo phpize7.1
-mkdir /usr/src/php-driver/build
-cd /usr/src/php-driver/build
-sudo ../ext/configure --with-php-config=/usr/bin/php-config7.1 > /dev/null
-make clean >/dev/null
-make >/dev/null 2>&1
-sudo make install
-sudo chmod 644 /usr/lib/php/20160303/cassandra.so
-
-cd /usr/src/php-driver/ext
-sudo phpize7.2
-cd /usr/src/php-driver/build
-sudo /usr/src/php-driver/ext/configure --with-php-config=/usr/bin/php-config7.2 > /dev/null
-sudo make clean >/dev/null
-make >/dev/null 2>&1
-sudo make install
-sudo chmod 644 /usr/lib/php/20170718/cassandra.so
-
-cd /usr/src/php-driver/ext
 sudo phpize7.3
 cd /usr/src/php-driver/build
 sudo /usr/src/php-driver/ext/configure --with-php-config=/usr/bin/php-config7.3 > /dev/null
@@ -61,14 +42,6 @@ sudo make clean >/dev/null
 make >/dev/null 2>&1
 sudo make install
 sudo chmod 644 /usr/lib/php/20180731/cassandra.so
-
-echo "; configuration for php cassandra module" >/etc/php/7.1/mods-available/cassandra.ini
-echo "; priority=20" >>/etc/php/7.1/mods-available/cassandra.ini
-echo "extension=cassandra.so" >>/etc/php/7.1/mods-available/cassandra.ini
-
-echo "; configuration for php cassandra module" >/etc/php/7.2/mods-available/cassandra.ini
-echo "; priority=20" >>/etc/php/7.2/mods-available/cassandra.ini
-echo "extension=cassandra.so" >>/etc/php/7.2/mods-available/cassandra.ini
 
 echo "; configuration for php cassandra module" >/etc/php/7.3/mods-available/cassandra.ini
 echo "; priority=20" >>/etc/php/7.3/mods-available/cassandra.ini
