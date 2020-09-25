@@ -37,14 +37,6 @@ class InitScriptTest extends TestCase
     }
 
     /** @test */
-    public function it_creates_a_homestead_json_file_if_requested()
-    {
-        exec('bash init.sh json');
-
-        $this->assertFileExists(self::$testDirectory . '/Homestead.json');
-    }
-
-    /** @test */
     public function it_creates_an_after_shell_script()
     {
         exec('bash init.sh');
