@@ -161,6 +161,21 @@ Not familiar with Nginx? No problem. The `sites` property allows you to easily m
 
 If you change the `sites` property after provisioning the Homestead box, you should re-run `vagrant reload --provision`  to update the Nginx configuration on the virtual machine.
 
+> **NOTE** Homestead scripts are built to be as idempotent as possible. However, if you are experiencing issues while provisioning you should destroy and rebuild the machine via `vagrant destroy && vagrant up`.
+
+
+#### Enable / Disable Services
+
+Homestead starts several services by default; however, you may customize which services are enabled or disabled during provisioning. For example, you may enable PostgreSQL and disable MySQL:
+
+    services:
+        - enabled:
+            - "postgresql@12-main"
+        - disabled:
+            - "mysql"
+
+The specified services will be started or stopped based on their order in the `enabled` and `disabled` directives.
+
 #### Hostname Resolution
 
 Homestead publishes hostnames over `mDNS` for automatic host resolution. If you set `hostname: homestead` in your `Homestead.yaml` file, the host will be available at `homestead.local`. MacOS, iOS, and Linux desktop distributions include `mDNS` support by default. Windows requires installing [Bonjour Print Services for Windows](https://support.apple.com/kb/DL999?viewlocale=en_US&locale=en_US).
@@ -243,6 +258,8 @@ alias ..='cd ..'
 ```
 
 After you have updated the `aliases` file, you should re-provision the Homestead machine using the `vagrant reload --provision` command. This will ensure that your new aliases are available on the machine.
+
+> **Tip** when updating Homestead it's a good idea to check for any changes made to the base alias file
 
 ## Daily Usage
 
@@ -478,22 +495,27 @@ After running the command, you will see an Ngrok screen appear which contains th
 
 ### Multiple PHP Versions
 
-Homestead supports multiple versions of PHP on the same virtual machine. You may specify which version of PHP to use for a given site within your `Homestead.yaml` file. The available PHP versions are: "7.0", "7.1", "7.2" and "7.3" (the default):
+Homestead supports multiple versions of PHP on the same virtual machine. You may specify which version of PHP to use for a given site within your `Homestead.yaml` file. The available PHP versions are: "7.3" and "7.4" (the default):
 
 ```
 sites:
     - map: homestead.test
       to: /home/vagrant/project1/public
-      php: "7.1"
+      php: "7.3"
 ```
 
 In addition, you may use any of the supported PHP versions via the CLI:
 
 ```
-php7.0 artisan list
-php7.1 artisan list
-php7.2 artisan list
 php7.3 artisan list
+php7.4 artisan list
+```
+
+You may also update the default CLI version by issuing the following commands from within your Homestead virtual machine:
+
+```
+php73
+php74
 ```
 
 ### Web Servers
@@ -518,7 +540,7 @@ To enable debugging, run the following commands inside your Vagrant box:
 sudo phpenmod xdebug
 
 # Update this command to match your PHP version...
-sudo systemctl restart php7.3-fpm 
+sudo systemctl restart php7.4-fpm 
 ```
 
 Next, follow your IDE's instructions to enable debugging. Finally, configure your browser to trigger Xdebug with an extension or [bookmarklet](https://www.jetbrains.com/phpstorm/marklets/).
