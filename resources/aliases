@@ -5,10 +5,20 @@ alias h='cd ~'
 alias c='clear'
 alias art=artisan
 
+alias stan=./scripts/stan
+alias lint=./scripts/lint
+
 alias codecept='vendor/bin/codecept'
 alias phpspec='vendor/bin/phpspec'
 alias phpunit='vendor/bin/phpunit'
+alias pu='vendor/bin/phpunit --stop-on-failure -d skip_view_cache'
+alias pum='vendor/bin/phpunit --stop-on-failure -d skip_migrations -d skip_view_cache'
+alias puma='vendor/bin/phpunit -d skip_migrations -d skip_view_cache'
+
 alias serve=serve-laravel
+
+alias work="clear; echo \"Listening...\"; artisan queue:work --verbose --tries=1 --timeout=300"
+alias lang='artisan localization:missing'
 
 alias xoff='sudo phpdismod -s cli xdebug'
 alias xon='sudo phpenmod -s cli xdebug'
@@ -29,6 +39,10 @@ function artisan() {
     php artisan "$@"
 }
 
+function tent() {
+    php artisan tenants:"$@"
+}
+
 function dusk() {
     pids=$(pidof /usr/bin/Xvfb)
 
@@ -36,25 +50,12 @@ function dusk() {
         Xvfb :0 -screen 0 1280x960x24 &
     fi
 
-    php artisan dusk "$@"
-}
-
-function php70() {
-    sudo update-alternatives --set php /usr/bin/php7.0
-    sudo update-alternatives --set php-config /usr/bin/php-config7.0
-    sudo update-alternatives --set phpize /usr/bin/phpize7.0
-}
-
-function php71() {
-    sudo update-alternatives --set php /usr/bin/php7.1
-    sudo update-alternatives --set php-config /usr/bin/php-config7.1
-    sudo update-alternatives --set phpize /usr/bin/phpize7.1
-}
-
-function php72() {
-    sudo update-alternatives --set php /usr/bin/php7.2
-    sudo update-alternatives --set php-config /usr/bin/php-config7.2
-    sudo update-alternatives --set phpize /usr/bin/phpize7.2
+    if [[ $? -eq 0 ]]
+    then
+        php artisan dusk
+    else
+        php artisan dusk --filter "$@"
+    fi
 }
 
 function php73() {
@@ -63,12 +64,18 @@ function php73() {
     sudo update-alternatives --set phpize /usr/bin/phpize7.3
 }
 
+function php74() {
+    sudo update-alternatives --set php /usr/bin/php7.4
+    sudo update-alternatives --set php-config /usr/bin/php-config7.4
+    sudo update-alternatives --set phpize /usr/bin/phpize7.4
+}
+
 function serve-apache() {
     if [[ "$1" && "$2" ]]
     then
         sudo bash /vagrant/scripts/create-certificate.sh "$1"
-        sudo dos2unix /vagrant/scripts/serve-apache.sh
-        sudo bash /vagrant/scripts/serve-apache.sh "$1" "$2" 80 443 "${3:-7.3}"
+        sudo dos2unix /vagrant/scripts/site-types/apache.sh
+        sudo bash /vagrant/scripts/site-types/apache.sh "$1" "$2" 80 443 "${3:-7.4}"
     else
         echo "Error: missing required parameters."
         echo "Usage: "
@@ -80,8 +87,8 @@ function serve-laravel() {
     if [[ "$1" && "$2" ]]
     then
         sudo bash /vagrant/scripts/create-certificate.sh "$1"
-        sudo dos2unix /vagrant/scripts/serve-laravel.sh
-        sudo bash /vagrant/scripts/serve-laravel.sh "$1" "$2" 80 443 "${3:-7.3}"
+        sudo dos2unix /vagrant/scripts/site-types/laravel.sh
+        sudo bash /vagrant/scripts/site-types/laravel.sh "$1" "$2" 80 443 "${3:-7.4}"
     else
         echo "Error: missing required parameters."
         echo "Usage: "
@@ -92,8 +99,8 @@ function serve-laravel() {
 function serve-proxy() {
     if [[ "$1" && "$2" ]]
     then
-        sudo dos2unix /vagrant/scripts/serve-proxy.sh
-        sudo bash /vagrant/scripts/serve-proxy.sh "$1" "$2" 80 443 "${3:-7.3}"
+        sudo dos2unix /vagrant/scripts/site-types/proxy.sh
+        sudo bash /vagrant/scripts/site-types/proxy.sh "$1" "$2" 80 443 "${3:-7.4}"
     else
         echo "Error: missing required parameters."
         echo "Usage: "
@@ -102,16 +109,16 @@ function serve-proxy() {
 }
 
 function serve-spa() {
-  if [[ "$1" && "$2" ]]
-  then
-    sudo bash /vagrant/scripts/create-certificate.sh "$1"
-    sudo dos2unix /vagrant/scripts/serve-spa.sh
-    sudo bash /vagrant/scripts/serve-spa.sh "$1" "$2" 80 443 "${3:-7.3}"
-  else
-    echo "Error: missing required parameters."
-    echo "Usage: "
-    echo "  serve-spa domain path"
-  fi
+    if [[ "$1" && "$2" ]]
+    then
+        sudo bash /vagrant/scripts/create-certificate.sh "$1"
+        sudo dos2unix /vagrant/scripts/site-types/spa.sh
+        sudo bash /vagrant/scripts/site-types/spa.sh "$1" "$2" 80 443 "${3:-7.4}"
+    else
+        echo "Error: missing required parameters."
+        echo "Usage: "
+        echo "  serve-spa domain path"
+    fi
 }
 
 function share() {
@@ -196,7 +203,7 @@ function xphp() {
     fi
 
     if ! $XDEBUG_ENABLED; then xon; fi
-	
+
     HOST_IP=$(last --limit=1 | grep -oP '\d+(\.\d+){3}')
 
     php \
