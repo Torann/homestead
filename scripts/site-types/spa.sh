@@ -37,6 +37,7 @@ block="server {
     index index.html;
 
     charset utf-8;
+    client_max_body_size 100m;
 
     $rewritesTXT
 
@@ -54,8 +55,6 @@ block="server {
 
     sendfile off;
 
-    client_max_body_size 100m;
-
     location ~ /\.ht {
         deny all;
     }
@@ -65,8 +64,8 @@ block="server {
         add_header Access-Control-Allow-Origin "*" always;
     }
 
-    ssl_certificate     /etc/nginx/ssl/$1.crt;
-    ssl_certificate_key /etc/nginx/ssl/$1.key;
+    ssl_certificate     /etc/ssl/certs/$1.crt;
+    ssl_certificate_key /etc/ssl/certs/$1.key;
 }
 "
 

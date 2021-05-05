@@ -4,17 +4,18 @@ export DEBIAN_FRONTEND=noninteractive
 
 if [ -f /home/vagrant/.homestead-features/couchdb ]
 then
-    echo "CouchDB already installed."
+    echo "couchdb already installed."
     exit 0
 fi
 
 touch /home/vagrant/.homestead-features/couchdb
 chown -Rf vagrant:vagrant /home/vagrant/.homestead-features
 
-echo "deb https://apache.bintray.com/couchdb-deb bionic main" \
-    | sudo tee -a /etc/apt/sources.list
+echo "deb https://apache.bintray.com/couchdb-deb focal main" \
+    | sudo tee -a /etc/apt/sources.list.d/couchdb.list
 
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 379CE192D401AB61
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys \
+  8756C4F765C9AC3CB6B85D62379CE192D401AB61
 sudo apt-get update
 echo "couchdb couchdb/mode select standalone
 couchdb couchdb/mode seen true
@@ -31,5 +32,6 @@ sudo service couchdb restart
 
 sudo service nginx restart
 
-sudo service php7.3-fpm restart
+
 sudo service php7.4-fpm restart
+sudo service php8.0-fpm restart

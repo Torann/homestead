@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export DEBIAN_FRONTEND=noninteractive
+
 if [ -f /home/vagrant/.homestead-features/webdriverutils ]
 then
     echo "Web Driver utilities already installed."

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export DEBIAN_FRONTEND=noninteractive
+
 if [ -f /home/vagrant/.homestead-features/golang ]
 then
     echo "Golang already installed."
@@ -10,8 +12,7 @@ touch /home/vagrant/.homestead-features/golang
 chown -Rf vagrant:vagrant /home/vagrant/.homestead-features
 
 # Install Golang
-
-golangVersion="1.15.2"
+golangVersion="1.16.3"
 wget https://dl.google.com/go/go${golangVersion}.linux-amd64.tar.gz -O golang.tar.gz
 tar -C /usr/local -xzf golang.tar.gz go
 printf "\nPATH=\"/usr/local/go/bin:\$PATH\"\n" | tee -a /home/vagrant/.profile

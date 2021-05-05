@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export DEBIAN_FRONTEND=noninteractive
+
 if [ -f /home/vagrant/.homestead-features/gearman ]
 then
     echo "gearman already installed."

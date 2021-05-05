@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
+export DEBIAN_FRONTEND=noninteractive
+
 if [ -f /home/vagrant/.homestead-features/neo4j ]
 then
-    echo "Neo4j already installed."
+    echo "neo4j already installed."
     exit 0
 fi
 

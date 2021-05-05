@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-# Check If Influxdb Has Been Installed
+
+export DEBIAN_FRONTEND=noninteractive
 
 if [ -f /home/vagrant/.homestead-features/influxdb ]
 then
-    echo "InfluxDB already installed."
+    echo "influxdb already installed."
     exit 0
 fi
 

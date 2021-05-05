@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-# Check If Chronograf Has Been Installed
+
+export DEBIAN_FRONTEND=noninteractive
 
 if [ -f /home/vagrant/.homestead-features/chronograf ]
 then
-    echo "Chronograf already installed."
+    echo "chronograf already installed."
     exit 0
 fi
 

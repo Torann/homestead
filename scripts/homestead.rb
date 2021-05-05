@@ -343,26 +343,14 @@ class Homestead
           # Should we use the wildcard ssl?
           if site['wildcard'] == 'yes' or site['use_wildcard'] == 'yes'
             if site['use_wildcard'] != 'no'
-              if site['type'] != 'apache'
-                config.vm.provision 'shell' do |s|
-                  s.inline = "sed -i \"s/$1.crt/*.$2.crt/\" /etc/nginx/sites-available/$1"
-                  s.args = [site['map'], site['map'].partition('.').last]
-                end
+              config.vm.provision 'shell' do |s|
+                s.inline = "sed -i \"s/$1.crt/*.$2.crt/\" /etc/nginx/sites-available/$1"
+                s.args = [site['map'], site['map'].partition('.').last]
+              end
 
-                config.vm.provision 'shell' do |s|
-                  s.inline = "sed -i \"s/$1.key/*.$2.key/\" /etc/nginx/sites-available/$1"
-                  s.args = [site['map'], site['map'].partition('.').last]
-                end
-              else
-                config.vm.provision 'shell' do |s|
-                  s.inline = "sed -i \"s/$1.crt/*.$2.crt/\" /etc/apache2/sites-available/$1-ssl.conf"
-                  s.args = [site['map'], site['map'].partition('.').last]
-                end
-
-                config.vm.provision 'shell' do |s|
-                  s.inline = "sed -i \"s/$1.key/*.$2.key/\" /etc/apache2/sites-available/$1-ssl.conf"
-                  s.args = [site['map'], site['map'].partition('.').last]
-                end
+              config.vm.provision 'shell' do |s|
+                s.inline = "sed -i \"s/$1.key/*.$2.key/\" /etc/nginx/sites-available/$1"
+                s.args = [site['map'], site['map'].partition('.').last]
               end
             end
           end

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export DEBIAN_FRONTEND=noninteractive
+
 if [ -f /home/vagrant/.homestead-features/docker ]
 then
     echo "docker already installed."

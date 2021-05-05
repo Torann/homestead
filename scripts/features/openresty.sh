@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-# Check if Openresty has been installed
+
+export DEBIAN_FRONTEND=noninteractive
 
 if [ -f /home/vagrant/.homestead-features/openresty ]
 then
-    echo "Openresty already installed."
+    echo "openresty already installed."
     exit 0
 fi
 

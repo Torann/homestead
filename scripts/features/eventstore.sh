@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-# Check if EventStore has been installed
+export DEBIAN_FRONTEND=noninteractive
+
 if [ -f /home/vagrant/.homestead-features/eventstore ]
 then
-    echo "EventStore already installed."
+    echo "eventstore already installed."
     exit 0
 fi
 

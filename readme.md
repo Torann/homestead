@@ -42,7 +42,7 @@
 
 Homestead is a pre-packaged Vagrant box that provides you a wonderful development environment without requiring you to install PHP, a web server, and any other server software on your local machine. No more worrying about messing up your operating system! Vagrant boxes are completely disposable. If something goes wrong, you can destroy and re-create the box in minutes!
 
-Homestead runs on any Windows, Mac, or Linux system, and includes the Nginx web server, PHP 7.3, MySQL, PostgreSQL, Redis, Memcached, Node, and all of the other goodies you need to develop amazing Laravel applications.
+Homestead runs on any Windows, Mac, or Linux system, and includes the Nginx web server, PHP 8.0, MySQL, PostgreSQL, Redis, Memcached, Node, and all of the other goodies you need to develop amazing Laravel applications.
 
 ### Included Software
 
@@ -205,21 +205,20 @@ features:
         server_token: "server_value"
         client_id: "client_id"
         client_token: "client_value"
-    - cassandra: true
     - chronograf: true
     - couchdb: true
     - crystal: true
     - docker: true
     - elasticsearch:
-        version: 7
+        version: 7.9.0
     - gearman: true
     - golang: true
     - grafana: true
     - influxdb: true
     - mariadb: true
+    - meilisearch: true
     - minio: true
     - mongodb: true
-    - mysql8: true
     - neo4j: true
     - ohmyzsh: true
     - openresty: true
@@ -365,7 +364,7 @@ Homestead supports several types of sites which allow you to easily run projects
           to: /home/vagrant/code/spa
           type: "spa"
 
-The available site types are: `apache`, `laravel` (the default), `proxy`, and `spa`.
+The available site types are: `laravel` (the default), `proxy`, and `spa`.
 
 #### Site Parameters
 
@@ -495,34 +494,28 @@ After running the command, you will see an Ngrok screen appear which contains th
 
 ### Multiple PHP Versions
 
-Homestead supports multiple versions of PHP on the same virtual machine. You may specify which version of PHP to use for a given site within your `Homestead.yaml` file. The available PHP versions are: "7.3" and "7.4" (the default):
+Homestead supports multiple versions of PHP on the same virtual machine. You may specify which version of PHP to use for a given site within your `Homestead.yaml` file. The available PHP versions are: "7.4" and "8.0" (the default):
 
 ```
 sites:
     - map: homestead.test
       to: /home/vagrant/project1/public
-      php: "7.3"
+      php: "7.4"
 ```
 
 In addition, you may use any of the supported PHP versions via the CLI:
 
 ```
-php7.3 artisan list
 php7.4 artisan list
+php8.0 artisan list
 ```
 
 You may also update the default CLI version by issuing the following commands from within your Homestead virtual machine:
 
 ```
-php73
 php74
+php80
 ```
-
-### Web Servers
-
-Homestead uses the Nginx web server by default. However, it can install Apache if `apache` is specified as a site type. While both web servers can be installed at the same time, they cannot both be *running* at the same time. The `flip` shell command is available to ease the process of switching between web servers. The `flip` command automatically determines which web server is running, shuts it off, and then starts the other server. To use this command, SSH into your Homestead machine and run the command in your terminal:
-
-    flip
 
 ### Mail
 
@@ -540,7 +533,7 @@ To enable debugging, run the following commands inside your Vagrant box:
 sudo phpenmod xdebug
 
 # Update this command to match your PHP version...
-sudo systemctl restart php7.4-fpm 
+sudo systemctl restart php8.0-fpm 
 ```
 
 Next, follow your IDE's instructions to enable debugging. Finally, configure your browser to trigger Xdebug with an extension or [bookmarklet](https://www.jetbrains.com/phpstorm/marklets/).
@@ -574,7 +567,6 @@ sites:
     -
         map: your-site.local
         to: /home/vagrant/code/web
-        type: "apache"
         xhgui: 'true'
 ```
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# Check If rvm Has Been Installed
+
+export DEBIAN_FRONTEND=noninteractive
 
 if [ -f /home/vagrant/.homestead-features/rvm ]
 then

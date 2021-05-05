@@ -14,10 +14,9 @@ trait GeneratesTestDirectory
      *
      * @return void
      */
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
-        self::$testDirectory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('homestead_', true);
-
+        self::$testDirectory = sys_get_temp_dir().DIRECTORY_SEPARATOR.uniqid('homestead_', true);
         mkdir(self::$testDirectory);
         chdir(self::$testDirectory);
     }
@@ -27,7 +26,7 @@ trait GeneratesTestDirectory
      *
      * @return void
      */
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         rmdir(self::$testDirectory);
     }
@@ -37,8 +36,8 @@ trait GeneratesTestDirectory
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
-        exec('rm -rf ' . self::$testDirectory . DIRECTORY_SEPARATOR . '*');
+        exec('rm -rf '.self::$testDirectory.DIRECTORY_SEPARATOR.'*');
     }
 }

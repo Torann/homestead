@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-# Check If Grafana Has Been Installed
+export DEBIAN_FRONTEND=noninteractive
 
 if [ -f /home/vagrant/.homestead-features/grafana ]
 then
-    echo "Grafana already installed."
+    echo "grafana already installed."
     exit 0
 fi
 

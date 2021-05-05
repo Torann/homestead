@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export DEBIAN_FRONTEND=noninteractive
+
 if [ -f /home/vagrant/.homestead-features/blackfire ]
 then
     echo "blackfire already installed."
@@ -38,6 +40,7 @@ timeout=15s
 echo "$agent" > "/etc/blackfire/agent"
 echo "$client" > "/home/vagrant/.blackfire.ini"
 
-service php7.3-fpm restart
+
 service php7.4-fpm restart
+service php8.0-fpm restart
 service blackfire-agent restart
