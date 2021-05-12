@@ -25,6 +25,12 @@ features:
     - postgresql: false
     - ohmyzsh: false
 
+#services:
+#    - enabled:
+#        - "postgresql@12-main"
+#    - disabled:
+#        - "postgresql@11-main"
+
 ports:
     - send: 62000
       to: 9200
