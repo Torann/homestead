@@ -226,7 +226,6 @@ features:
     - python: true
     - rabbitmq: true
     - solr: true
-    - webdriver: true
 ```
 
 #### MariaDB
